@@ -14,9 +14,16 @@ const fs = require("fs");
 // explicitly set the path to FFmpeg binary
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://speech-to-text-ai-nu.vercel.app/",
+      "https://speech-to-text-ai-jolenekearse.vercel.app/",
+      "https://speech-to-text-ai-git-main-jolenekearse.vercel.app/",
+    ],
+  })
+);
 app.use(express.json());
-
 
 // UTILITY FUNCTIONS
 // convert file buffer into readable stream for Whisper
@@ -32,7 +39,6 @@ const parseTimeStringToSeconds = (timeString) => {
   return minutes * 60 + seconds;
 };
 
-
 // ROUTES
 app.get("/", (req, res) => {
   res.send("Welcome to the Speech-to-Text API!");
@@ -46,7 +52,7 @@ app.post("/api/transcribe", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "No audio file provided " });
     }
     const audioStream = bufferToStream(audioFile.buffer);
-    
+
     // trim audio function with temporary filename to process audio
     const trimAudio = async (audioStream, endTime) => {
       const tempFileName = `temp-${Date.now()}.mp3`;
